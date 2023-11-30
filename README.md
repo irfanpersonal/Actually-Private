@@ -2,7 +2,7 @@
 
 1st - Download the project
 
-2nd - Run the following command "npm run install" (install dependencies)
+2nd - Run the following command "npm install" (install dependencies)
 
 3rd - Create a .env file in root with the following key value pairs MONGO_URI, JWT_SECRET, and JWT_LIFETIME
 
