@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const router = express_1.default.Router();
+const post_1 = require("../controllers/post");
+const comment_1 = require("../controllers/comment");
+const authentication_1 = require("../middleware/authentication");
+router.route('/').post(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.createPost);
+router.route('/globalSearch').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.globalSearch);
+router.route('/trending').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getTrendingTopics);
+router.route('/userFeed').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getUserFeed);
+router.route('/:id/comments').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getSinglePostComments);
+router.route('/:id/like').post(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.likePost);
+router.route('/:id/unlike').delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.unlikePost);
+router.route('/:id/comment').post(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.createSingleComment);
+router.route('/:id/comment/:commentID').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.getSingleComment);
+router.route('/:id/comment/:commentID').patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.updateSingleComment);
+router.route('/:id/comment/:commentID').delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.deleteSingleComment);
+router.route('/:id/comment/:commentID/like').post(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.likeComment);
+router.route('/:id/comment/:commentID/unlike').delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.unlikeComment);
+router.route('/:id').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getSinglePost).patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.updateSinglePost).delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.deleteSinglePost);
+exports.default = router;
