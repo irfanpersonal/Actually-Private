@@ -51,13 +51,13 @@ const userFeedSlice = createSlice({
             state.getUserFeedLoading = false;
         }).addCase(likePost.fulfilled, (state, action) => {
             const postID = action.meta.arg;
-            const likedPost = state.userFeed.find(item => item._id === postID);
+            const likedPost = state.completedUserFeed.find(item => item._id === postID);
             if (likedPost) {
                 likedPost!.liked = true;
             }
         }).addCase(unlikePost.fulfilled, (state, action) => {
             const postID = action.meta.arg;
-            const unlikedPost = state.userFeed.find(item => item._id === postID);
+            const unlikedPost = state.completedUserFeed.find(item => item._id === postID);
             if (unlikedPost) {
                 unlikedPost!.liked = false;
             }
