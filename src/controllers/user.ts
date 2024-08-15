@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import CustomError from '../errors';
-import {ITokenPayload, deleteImage} from '../utils';
+import {ITokenPayload, deleteFile} from '../utils';
 import {IUser} from '../models/User';
 import {IFollowRequest} from '../models/FollowRequest';
 import {User, FollowRequest} from '../models';
@@ -28,7 +28,8 @@ export interface UserRequest extends Request {
 }
 
 const showCurrentUser = async(req: UserRequest, res: Response) => {
-    return res.status(StatusCodes.OK).json({user: req.user!});
+    const user = await User.findById(req.user!.userID).select('-password');
+    return res.status(StatusCodes.OK).json({user});
 }
 
 const getProfileData = async(req: UserRequest, res: Response) => {
@@ -104,9 +105,10 @@ const getSingleUser = async(req: UserRequest, res: Response) => {
 }
 
 const updateUser = async(req: UserRequest, res: Response) => {
+    req.body.name = req.body.name.replace(/\s+/g, '');
     const updatedUser = (await User.findOneAndUpdate({_id: req.user!.userID}, req.body, {
         new: true,
-        runValidators: true,
+        runValidators: true
     }).select('-password'))!;
     if (req.body.visibility === 'public') {
         // Make it so that all the people who sent me a follow request automatically follow me
@@ -131,13 +133,13 @@ const updateUser = async(req: UserRequest, res: Response) => {
             await cloudinary.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
         }
         const uniqueIdentifier = new Date().getTime() + '_' + req.user!.name + '_' + 'profile' + '_' + profilePicture.name;
-        const destination = path.resolve(__dirname, '../images', uniqueIdentifier);
+        const destination = path.resolve(__dirname, '../files', uniqueIdentifier);
         await profilePicture.mv(destination);
         const result = await cloudinary.uploader.upload(destination, {
             public_id: uniqueIdentifier, 
             folder: 'ACTUALLY-PRIVATE/PROFILE_IMAGES'
         });
-        await deleteImage(destination);
+        await deleteFile(destination);
         updatedUser.profilePicture = result.secure_url;
         await updatedUser.save();
     }
@@ -163,11 +165,26 @@ const updateUserPassword = async(req: UserRequest, res: Response) => {
     }});
 }
 
+const discoverPeople = async(req: UserRequest, res: Response) => {
+    const users = await User.find({
+        role: {
+            $ne: 'admin'
+        },
+        _id: {
+            $ne: req.user!.userID
+        }
+    });
+    const shuffledUsers = users.sort(() => 0.5 - Math.random());
+    const randomThree = shuffledUsers.slice(0, 3);
+    return res.status(StatusCodes.OK).json({users: randomThree});
+}
+
 export {
     showCurrentUser,
     getProfileData,
     getAllUsers,
     getSingleUser,
     updateUser,
-    updateUserPassword
+    updateUserPassword,
+    discoverPeople
 };

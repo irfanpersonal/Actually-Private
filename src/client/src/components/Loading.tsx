@@ -36,13 +36,13 @@ const Wrapper = styled.div`
         box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
     }
     .icon {
-        color: black;
+        color: #1c2730;
         font-size: 2rem;
     }
     h1 {
-        margin-top: 1rem;
-        font-size: 1.5rem;
-        color: #333; 
+        font-size: 14px;
+        font-weight:500;
+        color: #FFFFFF;
     }
     @keyframes spinner {
         0% {

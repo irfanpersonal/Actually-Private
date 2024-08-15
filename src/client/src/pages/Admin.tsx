@@ -18,21 +18,58 @@ const Admin: React.FunctionComponent = () => {
     }, []);
     return (
         <Wrapper>
-            <div className="title">Stats Data</div>
+            <div className="header">
+                <div className="logo nUnderline">AP</div>
+                <div className="myAccount" onClick={() => { if (logoutLoading) { return; } dispatch(logoutUser()); }}>Logout</div>
+            </div>
+
             {getStatsLoading ? (
                 <Loading title='Loading Stats' position='normal' marginTop='1rem'/>
             ) : (
-                <div>
-                    <h2 style={{marginTop: '1rem', textAlign: 'center'}}>Welcome to the Admin Panel!</h2>
-                    <p className="intro-talk">Here, you'll find all the important numbers about what's happening on our platform. We'll tell you how many users we have, how many posts they've made, how many people want to follow them, and how many comments they've left. You can also see who the most popular users are and which posts everyone likes the most. </p>
+                <div className="pad20">
+                    <div className="adminheader">
+                        <h1 style={{}}>Welcome to the Admin Panel!</h1>
+                        <p>Here, you'll find all the important numbers about what's happening on our platform. We'll tell you how many users we have, how many posts they've made, how many people want to follow them, and how many comments they've left. You can also see who the most popular users are and which posts everyone likes the most. </p>
+                    </div>
+                    
                     {statsData ? (
                         <div>
-                            <h3 className="data-box"><FaUser/>User Count: {statsData.userCount}</h3>
-                            <h3 className="data-box"><FaEdit/>Post Count: {statsData.postCount}</h3>
-                            <h3 className="data-box"><FaComment/>Comment Count: {statsData.commentCount}</h3>
-                            <h3 className="data-box"><MdPending/>Follow Request Count: {statsData.followRequestCount}</h3>
-                            <h3 className="subtitle">Most Followed Users</h3>
-                            <div className="center">
+                            <div className="statBox">
+                                <div className="data-box">
+                                    <div className="statInner">
+                                        <FaUser/>
+                                        <div>User Count</div>
+                                    </div>
+                                    <span>{statsData.userCount}</span>
+                                </div>
+
+                                <div className="data-box">
+                                    <div className="statInner">
+                                        <FaEdit/>
+                                        <div>Post Count</div>
+                                    </div>
+                                    <span>{statsData.postCount}</span>
+                                </div>
+
+                                <div className="data-box">
+                                    <div className="statInner">
+                                        <FaComment/>
+                                        <div>Comment Count</div>
+                                    </div>
+                                    <span>{statsData.commentCount}</span>
+                                </div>
+
+                                <div className="data-box">
+                                    <div className="statInner">
+                                        <MdPending/>
+                                        <div>Follow Request Count</div>
+                                    </div>
+                                    <span>{statsData.followRequestCount}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="chartBox">
+                                <h3 className="subtitle">Most Followed Users</h3>
                                 <BarChart
                                     width={500}
                                     height={300}
@@ -46,34 +83,29 @@ const Admin: React.FunctionComponent = () => {
                                     <Bar dataKey="Follow Count" fill="black" />
                                 </BarChart>
                             </div>
-                            <h3 className="subtitle">Most Liked Posts</h3>
-                            <div className="center">
-                            <PieChart width={400} height={400}>
-                                <Pie
-                                    data={statsData.mostLikedPosts}
-                                    dataKey="likeCount"
-                                    fill="black"
-                                >
-                                </Pie>
-                                <Tooltip formatter={(value, index, array) => (
-                                    <div>
-                                        <div className="">User: {array.payload.user}</div>
-                                        <div className="">Post ID: {array.payload._id}</div>
-                                        <div className="">Like Count: {value}</div>
-                                    </div>
-                                )}/>
-                            </PieChart>
+                            
+                            <div className="chartBox">
+                                <h3 className="subtitle">Most Liked Posts</h3>
+                                <PieChart width={400} height={400}>
+                                    <Pie
+                                        data={statsData.mostLikedPosts}
+                                        dataKey="likeCount"
+                                        fill="black"
+                                    >
+                                    </Pie>
+                                    <Tooltip formatter={(value, index, array) => (
+                                        <div>
+                                            <div className="">User: {array.payload.user}</div>
+                                            <div className="">Post ID: {array.payload._id}</div>
+                                            <div className="">Like Count: {value}</div>
+                                        </div>
+                                    )}/>
+                                </PieChart>
                             </div>
                         </div>
                     ) : (
-                        <div className="title">Not Enough/Any Data</div>
+                        <div className="notEnough">Not Enough/Any Data</div>
                     )}
-                    <div onClick={() => {
-                        if (logoutLoading) {
-                            return;
-                        }
-                        dispatch(logoutUser());
-                    }} className="logout">{logoutLoading ? 'Logging Out' : 'Logout'}</div>
                 </div>
             )}
         </Wrapper>
@@ -81,50 +113,123 @@ const Admin: React.FunctionComponent = () => {
 }
 
 const Wrapper = styled.div`
-    padding: 0.5rem;
-    .title {
-        background-color: black;
-        color: white;
-        text-align: center;
-        padding: 0.5rem;
-    }
-    .intro-talk {
-        padding: 0.5rem;
-        background-color: lightgray;
-        margin-top: 1rem;
-    }
-    .data-box {
-        outline: 1px solid black;
-        padding: 0.5rem;
-        margin: 1rem 0;
-        display: flex;
-        align-items: center;
-        svg {
-            margin-right: 0.5rem;
+    margin: 0 auto;
+    padding: 10px;
+    .header {
+        padding:20px;
+        display:flex;
+        align-items:center;
+        justify-content: space-between;
+        a {
+            color:initial;
+            text-decoration:none;
+        }
+        .logo {
+            user-select: none;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            margin-right: 20px;
+            text-decoration: none;
+        }
+        .myAccount {
+            font-size:14px;
+            color:#FFFFFF;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            padding: 5px 20px;
+            border-radius: 999px;
+            background-color: rgb(28, 39, 48);
         }
     }
-    .subtitle {
-        border-bottom: 1px solid black;
-        text-align: center;
-        margin: 1rem 0;
+    .adminheader {
+        padding:20px;
+        margin-top:0px;
+        border-radius:12px;
+        background-color:rgb(28, 39, 48);
+        h1 {
+            font-size:18px;
+            color:#FFFFFF;
+            font-weight:500;
+        }
+        p {
+            font-size:14px;
+            color:#6c7a87;
+            margin-top:10px;
+        }
     }
-    .center {
-        padding: 1rem;
-        outline: 1px solid black;
+    .statBox {
+        gap:20px;
+        display:flex;
+        flex-direction:row;
+        margin-top:20px;
+        .data-box {
+            flex:1;
+            display:flex;
+            padding:20px;
+            margin-top:0px;
+            border-radius:12px;
+            flex-direction:column;
+            background-color:rgb(28, 39, 48);
+            .statInner {
+                display:flex;
+                flex-direction:row;
+                align-items:center;
+                svg {
+                    color:#6c7a87;
+                    margin-right:15px;
+                }
+                div {
+                    font-size:14px;
+                    color:#6c7a87;
+                }
+            }
+            span {
+                font-size:18px;
+                font-weight:500;
+                color:#FFFFFF;
+                margin-top:10px;
+            }
+            
+        }
+    }
+    .chartBox {
+        flex: 1;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 12px;
+        flex-direction: column;
+        background-color: rgb(28, 39, 48);
+        h3 {
+            font-size:18px;
+            font-weight:500;
+            color:#FFFFFF;
+            margin-bottom:40px;
+        }
+        * {
+            margin:auto;
+            max-width:100%;
+        }
     }
-    .logout {
-        cursor: pointer;
-        outline: 1px solid black;
-        padding: 0.5rem;
-        text-align: center;
-        margin-top: 1rem;
+    .notEnough {
+        display: flex;
+        padding: 20px;
+        font-size:14px;
+        color:#FFFFFF;
+        margin-top: 20px;
+        border-radius: 12px;
+        flex-direction: column;
+        background-color: rgb(28, 39, 48);
     }
-    .logout:active, .logout:hover {
-        background-color: black;
-        color: white;
+    @media (max-width:768px) {
+        .statBox {
+            flex-direction:column;
+        }
+        .pad20 {
+            padding:5px 15px 15px 15px;
+        }
     }
 `;
 

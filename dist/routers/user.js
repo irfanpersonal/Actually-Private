@@ -16,6 +16,7 @@ router.route('/getUsersPosts').get(authentication_1.authentication, (0, authenti
 router.route('/updateUser').patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), user_1.updateUser);
 router.route('/updateUserPassword').patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), user_1.updateUserPassword);
 router.route('/showCurrentUser').get(authentication_1.authentication, user_1.showCurrentUser);
+router.route('/discoverPeople').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), user_1.discoverPeople);
 router.route('/viewAllFollowRequests').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), follow_1.viewAllFollowRequests);
 router.route('/viewAllFollowRequests/:id').patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), follow_1.updateFollowRequest);
 router.route('/:id/getSingleUserPosts').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getSingleUserPosts);

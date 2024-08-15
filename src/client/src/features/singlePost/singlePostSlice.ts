@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {type PostType, type UserType} from '../profile/profileSlice';
-import {getSinglePost, getSinglePostComments, deleteSinglePost, likeSinglePost, unlikeSinglePost, likeSinglePostComment, unlikeSinglePostComment, deleteSinglePostComment, editSinglePostComment, updateSinglePost} from './singlePostThunk';
+import {getSinglePost, getSinglePostComments, deleteSinglePost, likeSinglePost, unlikeSinglePost, likeSinglePostComment, unlikeSinglePostComment, deleteSinglePostComment, editSinglePostComment} from './singlePostThunk';
 import {toast} from 'react-toastify';
 
 interface ISinglePost {
@@ -121,17 +121,6 @@ const singlePostSlice = createSlice({
             comment!.content = action.payload.content;
         }).addCase(editSinglePostComment.rejected, (state, action) => {
             state.editSinglePostCommentLoading = false;
-            toast.error(action.payload as string);
-        }).addCase(updateSinglePost.pending, (state) => {
-            state.editSinglePostLoading = true;
-        }).addCase(updateSinglePost.fulfilled, (state, action) => {
-            state.editSinglePostLoading = false;
-            state.singlePost!.image = action.payload.image;
-            state.singlePost!.content = action.payload.content;
-            state.singlePost!.location = action.payload.location;
-            toast.success('Edited Post!');
-        }).addCase(updateSinglePost.rejected, (state, action) => {
-            state.editSinglePostLoading = false;
             toast.error(action.payload as string);
         });
     }

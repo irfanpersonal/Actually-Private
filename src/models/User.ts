@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 
 export interface IUser extends mongoose.Document {
     name: string,
+    nickName: string,
     email: string,
     password: string,
     profilePicture: string,
@@ -26,7 +27,13 @@ const userSchema = new mongoose.Schema<IUser>({
         type: String,
         required: [true, 'Must Provide User Name'],
         minLength: 3,
+        trim: true,
         unique: true
+    },
+    nickName: {
+        type: String,
+        required: [true, 'Must Provide User Nickname'],
+        minlength: 3
     },
     email: {
         type: String,
@@ -103,6 +110,7 @@ userSchema.pre('save', async function(this: IUser) {
         return;
     }
     const randomBytes = await bcrypt.genSalt(10);
+    this.name = this.name.replace(/\s+/g, '');
     this.password = await bcrypt.hash(this.password, randomBytes);
 });
 

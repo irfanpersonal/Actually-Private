@@ -6,7 +6,7 @@ export const createPost = createAsyncThunk('post/createPost', async(postData: Fo
     try {
         const response = await axios.post('/api/v1/post', postData);
         const data = response.data;
-        return data;
+        return data.post;
     }
     catch(error: any) {
         return thunkAPI.rejectWithValue(error.response.data.msg);

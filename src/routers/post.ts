@@ -1,7 +1,7 @@
 import express from 'express';
 const router: express.Router = express.Router();
 
-import {getUserFeed, createPost, getSinglePost, getSinglePostComments, updateSinglePost, deleteSinglePost, likePost, unlikePost, getTrendingTopics, globalSearch} from '../controllers/post';
+import {getUserFeed, createPost, getSinglePost, getSinglePostComments, deleteSinglePost, likePost, unlikePost, getTrendingTopics, globalSearch} from '../controllers/post';
 import {createSingleComment, getSingleComment, updateSingleComment, deleteSingleComment, likeComment, unlikeComment} from '../controllers/comment';
 import {authentication, restrictFunctionalityTo} from '../middleware/authentication';
 
@@ -18,6 +18,6 @@ router.route('/:id/comment/:commentID').patch(authentication, restrictFunctional
 router.route('/:id/comment/:commentID').delete(authentication, restrictFunctionalityTo('user'), deleteSingleComment);
 router.route('/:id/comment/:commentID/like').post(authentication, restrictFunctionalityTo('user'), likeComment);
 router.route('/:id/comment/:commentID/unlike').delete(authentication, restrictFunctionalityTo('user'), unlikeComment);
-router.route('/:id').get(authentication, restrictFunctionalityTo('user'), getSinglePost).patch(authentication, restrictFunctionalityTo('user'), updateSinglePost).delete(authentication, restrictFunctionalityTo('user'), deleteSinglePost);
+router.route('/:id').get(authentication, restrictFunctionalityTo('user'), getSinglePost).delete(authentication, restrictFunctionalityTo('user'), deleteSinglePost);
 
 export default router;

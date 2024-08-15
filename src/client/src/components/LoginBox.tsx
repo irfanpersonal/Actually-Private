@@ -3,7 +3,7 @@ const LoginBox: React.FunctionComponent = () => {
         <>
             <div>
                 <label htmlFor="email">Email Address</label>
-                <input id="email" type="email" name="email" required/>
+                <input placeholder="example@domain.com" id="email" type="email" name="email" required/>
             </div>
             <div>
                 <label htmlFor="password">Password</label>

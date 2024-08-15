@@ -44,3 +44,25 @@ export const logoutUser = createAsyncThunk('user/logout', async(_, thunkAPI) => 
         return thunkAPI.rejectWithValue(error.response.data.msg);
     }
 });
+
+export const getUserBoxInformation = createAsyncThunk('user/getUserBoxInformation', async(_, thunkAPI) => {
+    try {
+        const response = await axios.get('/api/v1/user/getProfileData');
+        const data = response.data;
+        return data.user;
+    }
+    catch(error: any) {
+        return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+});
+
+export const getDisoverPeopleInformation = createAsyncThunk('user/getDisoverPeopleInformation', async(_, thunkAPI) => {
+    try {
+        const response = await axios.get('/api/v1/user/discoverPeople');
+        const data = response.data;
+        return data.users;
+    }
+    catch(error: any) {
+        return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+});

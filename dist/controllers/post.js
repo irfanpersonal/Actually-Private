@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.globalSearch = exports.getTrendingTopics = exports.getSingleUserPosts = exports.unlikePost = exports.likePost = exports.getUsersPosts = exports.deleteSinglePost = exports.updateSinglePost = exports.getSinglePostComments = exports.getSinglePost = exports.createPost = exports.getUserFeed = void 0;
+exports.globalSearch = exports.getTrendingTopics = exports.getSingleUserPosts = exports.unlikePost = exports.likePost = exports.getUsersPosts = exports.deleteSinglePost = exports.getSinglePostComments = exports.getSinglePost = exports.createPost = exports.getUserFeed = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const models_1 = require("../models");
 const errors_1 = __importDefault(require("../errors"));
@@ -46,16 +46,21 @@ const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 $project: {
                     _id: 1,
                     content: 1,
-                    image: 1,
+                    type: 1,
+                    attachmentUrl: 1,
                     location: 1,
                     user: {
                         _id: 1,
                         name: 1,
+                        nickName: 1,
                         email: 1,
                         location: 1,
                         profilePicture: 1
                     },
-                    likes: 1
+                    likes: 1,
+                    comments: 1,
+                    createdAt: 1,
+                    updatedAt: 1
                 }
             }
         ];
@@ -88,29 +93,52 @@ const getUserFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getUserFeed = getUserFeed;
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     const { content } = req.body;
-    if (!((_a = req.files) === null || _a === void 0 ? void 0 : _a.image) || !content) {
-        throw new errors_1.default.BadRequestError('Please provide post content and image!');
+    if (!content) {
+        throw new errors_1.default.BadRequestError('Please provide content for post!');
     }
-    const postImage = (_b = req.files) === null || _b === void 0 ? void 0 : _b.image;
-    if (!postImage.mimetype.startsWith('image')) {
-        throw new errors_1.default.BadRequestError('File must be an image!');
+    if ((_a = req.files) === null || _a === void 0 ? void 0 : _a.attachment) {
+        // If attachment provided that means it is a Image, Video, or Audio Post
+        const attachment = req.files.attachment;
+        if (attachment.mimetype.startsWith('image')) {
+            req.body.type = 'image';
+        }
+        else if (attachment.mimetype.startsWith('video')) {
+            req.body.type = 'video';
+        }
+        else if (attachment.mimetype.startsWith('audio')) {
+            req.body.type = 'audio';
+        }
+        else {
+            req.body.type = 'file';
+        }
+        const size = 1000000 * 2;
+        if (attachment.size > size) {
+            throw new errors_1.default.BadRequestError('File Size cannot be over 2MB!');
+        }
+        const uniqueIdentifier = new Date().getTime() + '_' + req.user.name + '_' + 'post' + '_' + attachment.name;
+        const destination = node_path_1.default.resolve(__dirname, '../files', uniqueIdentifier);
+        yield attachment.mv(destination);
+        const result = yield cloudinary_1.v2.uploader.upload(destination, {
+            public_id: uniqueIdentifier,
+            folder: 'ACTUALLY-PRIVATE/POST_MEDIA',
+            resource_type: 'auto'
+        });
+        yield (0, utils_1.deleteFile)(destination);
+        req.body.attachmentUrl = result.secure_url;
+        req.body.user = req.user.userID;
     }
-    if (postImage.size > 1000000 * 2) {
-        throw new errors_1.default.BadRequestError('Image Size cannot be over 2MB!');
+    else {
+        // If no attachment provided that means this is a Content Post
+        req.body.type = 'content';
+        req.body.user = req.user.userID;
     }
-    const uniqueIdentifier = new Date().getTime() + '_' + req.user.name + '_' + 'post' + '_' + postImage.name;
-    const destination = node_path_1.default.resolve(__dirname, '../images', uniqueIdentifier);
-    yield postImage.mv(destination);
-    const result = yield cloudinary_1.v2.uploader.upload(destination, {
-        public_id: uniqueIdentifier,
-        folder: 'ACTUALLY-PRIVATE/POST_IMAGES'
+    const createdPost = yield models_1.Post.create(req.body);
+    const post = yield models_1.Post.findById(createdPost._id).populate({
+        path: 'user',
+        select: '-password'
     });
-    yield (0, utils_1.deleteImage)(destination);
-    req.body.image = result.secure_url;
-    req.body.user = req.user.userID;
-    const post = yield models_1.Post.create(req.body);
     return res.status(http_status_codes_1.StatusCodes.OK).json({ post });
 });
 exports.createPost = createPost;
@@ -159,47 +187,6 @@ const getSinglePostComments = (req, res) => __awaiter(void 0, void 0, void 0, fu
     return res.status(http_status_codes_1.StatusCodes.OK).json({ comments: processedComments, totalComments, numberOfPages });
 });
 exports.getSinglePostComments = getSinglePostComments;
-const updateSinglePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c, _d;
-    const { id } = req.params;
-    const post = yield models_1.Post.findOne({ _id: id, user: req.user.userID });
-    if (!post) {
-        throw new errors_1.default.NotFoundError('No Post Found with the ID Provided!');
-    }
-    const { content, location } = req.body;
-    if (content) {
-        post.content = content;
-    }
-    if (location) {
-        post.location = location;
-    }
-    if ((_c = req.files) === null || _c === void 0 ? void 0 : _c.image) {
-        const postImage = (_d = req.files) === null || _d === void 0 ? void 0 : _d.image;
-        if (!postImage.mimetype.startsWith('image')) {
-            throw new errors_1.default.BadRequestError('File must be an image!');
-        }
-        if (postImage.size > 1000000 * 2) {
-            throw new errors_1.default.BadRequestError('Image Size cannot be over 2MB!');
-        }
-        if (post.image) {
-            const oldImage = post.image.substring(post.image.indexOf('ACTUALLY'));
-            yield cloudinary_1.v2.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
-        }
-        const uniqueIdentifier = new Date().getTime() + '_' + req.user.name + '_' + 'post' + '_' + postImage.name;
-        const destination = node_path_1.default.resolve(__dirname, '../images', uniqueIdentifier);
-        yield postImage.mv(destination);
-        const result = yield cloudinary_1.v2.uploader.upload(destination, {
-            public_id: uniqueIdentifier,
-            folder: 'ACTUALLY-PRIVATE/POST_IMAGES'
-        });
-        yield (0, utils_1.deleteImage)(destination);
-        post.image = result.secure_url;
-        yield post.save();
-    }
-    yield post.save();
-    return res.status(http_status_codes_1.StatusCodes.OK).json({ post });
-});
-exports.updateSinglePost = updateSinglePost;
 const deleteSinglePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const post = yield models_1.Post.findOne({ _id: id, user: req.user.userID });
@@ -211,8 +198,8 @@ const deleteSinglePost = (req, res) => __awaiter(void 0, void 0, void 0, functio
         yield models_1.Comment.deleteOne({ _id: comment });
     }));
     // Check if Post has an Image and if it does delete it
-    if (post.image) {
-        const oldImage = post.image.substring(post.image.indexOf('ACTUALLY'));
+    if (post.attachmentUrl) {
+        const oldImage = post.attachmentUrl.substring(post.attachmentUrl.indexOf('ACTUALLY'));
         yield cloudinary_1.v2.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
     }
     yield post.deleteOne();
@@ -388,8 +375,9 @@ const globalSearch = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         {
             $project: {
                 _id: 1,
+                type: 1,
                 content: 1,
-                image: 1,
+                attachmentUrl: 1,
                 location: 1,
                 user: {
                     _id: 1,
@@ -398,7 +386,10 @@ const globalSearch = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     location: 1,
                     profilePicture: 1
                 },
-                likes: 1
+                likes: 1,
+                comments: 1,
+                createdAt: 1,
+                updatedAt: 1
             }
         }
     ];

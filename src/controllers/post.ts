@@ -4,7 +4,7 @@ import {IPost} from '../models/Post';
 import {IUser} from '../models/User';
 import {User, Post, Comment} from '../models';
 import CustomError from '../errors';
-import {ITokenPayload, deleteImage} from '../utils';
+import {ITokenPayload, deleteFile} from '../utils';
 import mongoose from 'mongoose';
 import {UploadedFile} from 'express-fileupload';
 import path from 'node:path';
@@ -50,16 +50,21 @@ const getUserFeed = async(req: PostRequest, res: Response) => {
                 $project: {
                     _id: 1,
                     content: 1,
-                    image: 1,
+                    type: 1,
+                    attachmentUrl: 1,
                     location: 1,
                     user: {
                         _id: 1, 
                         name: 1,
+                        nickName: 1,
                         email: 1,
                         location: 1, 
                         profilePicture: 1 
                     },
-                    likes: 1 
+                    likes: 1,
+                    comments: 1,
+                    createdAt: 1,
+                    updatedAt: 1
                 }
             }
         ];
@@ -93,27 +98,50 @@ const getUserFeed = async(req: PostRequest, res: Response) => {
 
 const createPost = async(req: PostRequest, res: Response) => {
     const {content} = req.body;
-    if (!req.files?.image || !content) {
-        throw new CustomError.BadRequestError('Please provide post content and image!');
+    if (!content) {
+        throw new CustomError.BadRequestError('Please provide content for post!');
     }
-    const postImage = req.files?.image as UploadedFile;
-    if (!postImage.mimetype.startsWith('image')) {
-        throw new CustomError.BadRequestError('File must be an image!');
+    if (req.files?.attachment) {
+        // If attachment provided that means it is a Image, Video, or Audio Post
+        const attachment = req.files.attachment as UploadedFile;
+        if (attachment.mimetype.startsWith('image')) {
+            req.body.type = 'image';
+        }
+        else if (attachment.mimetype.startsWith('video')) {
+            req.body.type = 'video';
+        }
+        else if (attachment.mimetype.startsWith('audio')) {
+            req.body.type = 'audio';
+        }
+        else {
+            req.body.type = 'file';
+        }
+        const size = 1000000 * 2;
+        if (attachment.size > size) {
+            throw new CustomError.BadRequestError('File Size cannot be over 2MB!');
+        }
+        const uniqueIdentifier = new Date().getTime() + '_' + req.user!.name + '_' + 'post' + '_' + attachment.name;
+        const destination = path.resolve(__dirname, '../files', uniqueIdentifier);
+        await attachment.mv(destination);
+        const result = await cloudinary.uploader.upload(destination, {
+            public_id: uniqueIdentifier,
+            folder: 'ACTUALLY-PRIVATE/POST_MEDIA',
+            resource_type: 'auto'
+        });
+        await deleteFile(destination);
+        req.body.attachmentUrl = result.secure_url;
+        req.body.user = req.user!.userID as any;
     }
-    if (postImage.size > 1000000 * 2) {
-        throw new CustomError.BadRequestError('Image Size cannot be over 2MB!');
+    else {
+        // If no attachment provided that means this is a Content Post
+        req.body.type = 'content';
+        req.body.user = req.user!.userID as any;
     }
-    const uniqueIdentifier = new Date().getTime() + '_' + req.user!.name + '_' + 'post' + '_' + postImage.name;
-    const destination = path.resolve(__dirname, '../images', uniqueIdentifier);
-    await postImage.mv(destination);
-    const result = await cloudinary.uploader.upload(destination, {
-        public_id: uniqueIdentifier, 
-        folder: 'ACTUALLY-PRIVATE/POST_IMAGES'
+    const createdPost = await Post.create(req.body);
+    const post = await Post.findById(createdPost._id).populate({
+        path: 'user',
+        select: '-password'
     });
-    await deleteImage(destination);
-    req.body.image = result.secure_url;
-    req.body.user = req.user!.userID as unknown as mongoose.Schema.Types.ObjectId;
-    const post = await Post.create(req.body);
     return res.status(StatusCodes.OK).json({post});
 }
 
@@ -162,46 +190,6 @@ const getSinglePostComments = async(req: PostRequest, res: Response) => {
     return res.status(StatusCodes.OK).json({comments: processedComments, totalComments, numberOfPages});
 }
 
-const updateSinglePost = async(req: PostRequest, res: Response) => { 
-    const {id} = req.params;
-    const post = await Post.findOne({_id: id, user: req.user!.userID});
-    if (!post) {
-        throw new CustomError.NotFoundError('No Post Found with the ID Provided!');
-    }
-    const {content, location} = req.body;
-    if (content) {
-        post.content = content;
-    }
-    if (location) {
-        post.location = location;
-    }
-    if (req.files?.image) {
-        const postImage = req.files?.image as UploadedFile;
-        if (!postImage.mimetype.startsWith('image')) {
-            throw new CustomError.BadRequestError('File must be an image!');
-        }
-        if (postImage.size > 1000000 * 2) {
-            throw new CustomError.BadRequestError('Image Size cannot be over 2MB!');
-        }
-        if (post.image) {
-            const oldImage = post.image.substring(post.image.indexOf('ACTUALLY'));
-            await cloudinary.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
-        }
-        const uniqueIdentifier = new Date().getTime() + '_' + req.user!.name + '_' + 'post' + '_' + postImage.name;
-        const destination = path.resolve(__dirname, '../images', uniqueIdentifier);
-        await postImage.mv(destination);
-        const result = await cloudinary.uploader.upload(destination, {
-            public_id: uniqueIdentifier, 
-            folder: 'ACTUALLY-PRIVATE/POST_IMAGES'
-        });
-        await deleteImage(destination);
-        post.image = result.secure_url;
-        await post.save();
-    }
-    await post.save();
-    return res.status(StatusCodes.OK).json({post});
-}
-
 const deleteSinglePost = async(req: PostRequest, res: Response) => {
     const {id} = req.params;
     const post = await Post.findOne({_id: id, user: req.user!.userID});
@@ -213,8 +201,8 @@ const deleteSinglePost = async(req: PostRequest, res: Response) => {
         await Comment.deleteOne({_id: comment})
     });
     // Check if Post has an Image and if it does delete it
-    if (post.image) {
-        const oldImage = post.image.substring(post.image.indexOf('ACTUALLY'));
+    if (post.attachmentUrl) {
+        const oldImage = post.attachmentUrl.substring(post.attachmentUrl.indexOf('ACTUALLY'));
         await cloudinary.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
     }
     await post.deleteOne();
@@ -391,8 +379,9 @@ const globalSearch = async(req: PostRequest, res: Response) => {
         {
             $project: {
                 _id: 1,
+                type: 1,
                 content: 1,
-                image: 1,
+                attachmentUrl: 1,
                 location: 1,
                 user: {
                     _id: 1, 
@@ -401,7 +390,10 @@ const globalSearch = async(req: PostRequest, res: Response) => {
                     location: 1, 
                     profilePicture: 1 
                 },
-                likes: 1 
+                likes: 1,
+                comments: 1,
+                createdAt: 1,
+                updatedAt: 1
             }
         }
     ];
@@ -420,7 +412,6 @@ export {
     createPost,
     getSinglePost,
     getSinglePostComments,
-    updateSinglePost,
     deleteSinglePost,
     getUsersPosts,
     likePost,

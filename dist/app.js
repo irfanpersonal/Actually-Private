@@ -27,7 +27,6 @@ const admin_1 = __importDefault(require("./routers/admin"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const cloudinary_1 = require("cloudinary");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const http_status_codes_1 = require("http-status-codes");
 const node_path_1 = __importDefault(require("node:path"));
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -42,9 +41,9 @@ app.use('/api/v1/auth', auth_1.default);
 app.use('/api/v1/user', user_1.default);
 app.use('/api/v1/post', post_1.default);
 app.use('/api/v1/admin', admin_1.default);
-app.get('*', (req, res) => {
-    return res.status(http_status_codes_1.StatusCodes.OK).sendFile(node_path_1.default.resolve(__dirname, './client/build/index.html'));
-});
+// app.get('*', (req: Request, res: Response) => {
+//     return res.status(StatusCodes.OK).sendFile(path.resolve(__dirname, './client/build/index.html'));
+// });
 app.use(not_found_1.default);
 app.use(error_handler_1.default);
 const port = Number(process.env.PORT) || 4000;

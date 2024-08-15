@@ -5,17 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const postSchema = new mongoose_1.default.Schema({
-    location: {
+    type: {
+        type: String,
+        required: [true, 'Must Provide Post Type'],
+        enum: {
+            values: ['content', 'image', 'video', 'audio', 'file'],
+            message: '{VALUE} is not supported'
+        }
+    },
+    attachmentUrl: {
         type: String,
         default: ''
-    },
-    image: {
-        type: String,
-        required: [true, 'Must Provide Post Image']
     },
     content: {
         type: String,
         required: [true, 'Must Provide Post Content']
+    },
+    location: {
+        type: String,
+        default: ''
     },
     user: {
         type: mongoose_1.default.Schema.Types.ObjectId,

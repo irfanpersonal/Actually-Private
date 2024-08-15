@@ -22,14 +22,19 @@ const TrendingTopicsListItem: React.FunctionComponent<TrendingTopicsListItemProp
 }
 
 const Wrapper = styled.article`
+    color: white;
     .topic {
-        outline: 1px solid black;
-        padding: 1rem;
-        margin: 1rem 0;
+        font-size:14px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         cursor: pointer;
+        margin: 0px 10px;
+        padding: 20px 0px;
+        border-bottom: 1px solid #27343e;
     }
     .topic:hover, .topic:active {
-        background-color: lightgray;
+        border-color:#FFFFFF;
     }
 `;
 

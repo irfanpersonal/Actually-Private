@@ -22,6 +22,10 @@ const userSchema = new mongoose_1.default.Schema({
         minLength: 3,
         unique: true
     },
+    nickName: {
+        type: String,
+        default: ''
+    },
     email: {
         type: String,
         required: [true, 'Must Provide User Email'],
@@ -93,6 +97,9 @@ const userSchema = new mongoose_1.default.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 userSchema.pre('save', function () {
     return __awaiter(this, void 0, void 0, function* () {
+        if (this.isNew) {
+            this.nickName = this.name;
+        }
         if (!this.isModified('password')) {
             return;
         }

@@ -54,12 +54,14 @@ const userFeedSlice = createSlice({
             const likedPost = state.completedUserFeed.find(item => item._id === postID);
             if (likedPost) {
                 likedPost!.liked = true;
+                likedPost!.likes.push('NEW LIKE');
             }
         }).addCase(unlikePost.fulfilled, (state, action) => {
             const postID = action.meta.arg;
             const unlikedPost = state.completedUserFeed.find(item => item._id === postID);
             if (unlikedPost) {
                 unlikedPost!.liked = false;
+                unlikedPost.likes.pop();
             }
         });
     }

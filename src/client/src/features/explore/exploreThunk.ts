@@ -24,3 +24,14 @@ export const getTrendingTopics = createAsyncThunk('explore/getTrendingTopics', a
         return thunkAPI.rejectWithValue(error.response.data.msg);
     }
 });
+
+export const getTrendingBoxInformation = createAsyncThunk('explore/getTrendingBoxInformation', async(_, thunkAPI) => {
+    try {
+        const response = await axios.get('/api/v1/post/trending');
+        const data = response.data;
+        return data.trending;
+    }
+    catch(error: any) {
+        return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+});

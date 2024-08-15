@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+import {type useSelectorType} from '../../store';
 import axios from 'axios';
 
 export const getSingleUser = createAsyncThunk('singleUser/getSingleUser', async(userID: string, thunkAPI) => {
@@ -14,7 +15,8 @@ export const getSingleUser = createAsyncThunk('singleUser/getSingleUser', async(
 
 export const getSingleUserPosts = createAsyncThunk('singleUser/getSingleUserPosts', async(userID: string, thunkAPI) => {
     try {
-        const response = await axios.get(`/api/v1/user/${userID}/getSingleUserPosts`);
+        const {page} = (thunkAPI.getState() as useSelectorType).singleUser;
+        const response = await axios.get(`/api/v1/user/${userID}/getSingleUserPosts?page=${page}`);
         const data = response.data;
         return data;
     }

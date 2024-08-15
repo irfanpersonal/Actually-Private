@@ -21,7 +21,7 @@ const UsersListItem: React.FunctionComponent<UsersListItemProps> = ({data}) => {
 }
 
 const Wrapper = styled.article`
-    padding: 0.25rem;
+    padding: 20px 0px 0px 0px;
     a {
         text-decoration: none;
         color: black;
@@ -31,14 +31,19 @@ const Wrapper = styled.article`
         display: flex;
         align-items: center;
         .user-pfp {
-            outline: 1px solid black;
-            width: 1.5rem;
-            height: 1.5rem;
-            margin-right: 1rem;
+            width: 30px;
+            height: 30px;
+            border-radius:999px;
+            object-fit:cover;
+        }
+        div {
+            font-size:14px;
+            color:#FFFFFF;
+            margin-left:10px;
+            text-transform:capitalize;
         }
     }
     &:hover, &:active {
-        background-color: lightgray;
     }
 `;
 

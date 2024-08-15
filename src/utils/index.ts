@@ -38,7 +38,7 @@ const verifyToken = (token: string) => {
     return (jwt.verify(token, process.env.JWT_SECRET as string) as ITokenPayload);
 }
 
-const deleteImage = async(path: string) => {
+const deleteFile = async(path: string) => {
     await fs.unlink(path, (err) => {
         if (err) {
             console.log(err);
@@ -57,6 +57,6 @@ export {
     createToken,
     createCookieWithToken,
     verifyToken,
-    deleteImage,
+    deleteFile,
     formatDuration
 };

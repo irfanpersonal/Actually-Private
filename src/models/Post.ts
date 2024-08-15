@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 
 export interface IPost {
-    location: string,
-    image: string,
+    type: 'content' | 'image' | 'video' | 'audio' | 'file',
+    attachmentUrl: string,
     content: string,
+    location: string,
     user: mongoose.Schema.Types.ObjectId,
     likes: mongoose.Schema.Types.ObjectId[],
     comments: mongoose.Schema.Types.ObjectId[],
@@ -12,17 +13,25 @@ export interface IPost {
 }
 
 const postSchema = new mongoose.Schema<IPost>({
-    location: {
+    type: {
+        type: String,
+        required: [true, 'Must Provide Post Type'],
+        enum: {
+            values: ['content', 'image', 'video', 'audio', 'file'],
+            message: '{VALUE} is not supported'
+        }
+    },
+    attachmentUrl: {
         type: String,
         default: ''
-    },
-    image: {
-        type: String,
-        required: [true, 'Must Provide Post Image']
     },
     content: {
         type: String,
         required: [true, 'Must Provide Post Content']
+    },
+    location: {
+        type: String,
+        default: ''
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -22,7 +22,7 @@ const navigationSlice = createSlice({
         builder.addCase(deleteSinglePost.fulfilled, (state) => {
             state.location = state.location === `/profile` ? `/profile#` : `/profile`;
         }).addCase(createPost.fulfilled, (state, action) => {
-            state.location = state.location === `/post/${action.payload.post._id}` ? `/post/${action.payload.post._id}#` : `/post/${action.payload.post._id}`;
+            // state.location = state.location === `/post/${action.payload.post._id}` ? `/post/${action.payload.post._id}#` : `/post/${action.payload.post._id}`;
         }).addCase(getSingleUser.rejected, (state) => {
             state.location = state.location === `/` ? `/#` : `/`;
         }).addCase(getSinglePost.rejected, (state) => {

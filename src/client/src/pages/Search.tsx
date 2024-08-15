@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {type useDispatchType, type useSelectorType} from '../store';
 import {getGlobalSearch, getSuggestedUsers} from '../features/search/searchThunk';
 import {FaSearch} from 'react-icons/fa';
-import {Loading, PostsList, PaginationBox} from '../components';
+import {Loading, PostsList, PaginationBox, UserBox, TrendingBox} from '../components';
 import {setPage, setSearch} from '../features/search/searchSlice';
 import {useNavigate} from 'react-router-dom';
 
@@ -20,114 +20,149 @@ const Search: React.FunctionComponent = () => {
     }, []);
     return (
         <Wrapper>
-            <div className="search-box">
-                <div className="search">
-                    <input id="search" type="search" name="search" value={search} onChange={(event) => {
-                        dispatch(setSearch(event.target.value));
-                    }}/>
-                    <button onClick={() => {
-                        dispatch(getGlobalSearch());
-                    }}>
-                        <FaSearch/>
-                    </button>
-                </div>
-            </div>
-            <div className="people-box">
-                <div className="title">Suggested Users</div>
-                {getSuggestedUsersLoading ? (
-                    <div className="loading">Loading People...</div>
-                ) : (
-                    <>
-                        {!suggestedUsers.length && (
-                            <div style={{marginTop: '0.25rem'}}>No Suggested Users Found...</div>
+            <div className="container">
+                <UserBox/>
+                <div className="half">
+                    <div className="search-box">
+                        <div className="search">
+                            <input id="search" type="search" name="search" placeholder="Search here" value={search} onChange={(event) => {
+                                dispatch(setSearch(event.target.value));
+                            }}/>
+                            <button onClick={() => {
+                                dispatch(getGlobalSearch());
+                            }}>
+                                <FaSearch/>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="people-box">
+                        <div className="title">Users</div>
+                        {getSuggestedUsersLoading ? (
+                            <div className="loading">Loading People.</div>
+                        ) : (
+                            <div className="searchPostResponse">
+                            <>
+                                {!suggestedUsers.length && (
+                                    <div className="noResponse">No users Found.</div>
+                                )}
+                                {suggestedUsers.map(user => {
+                                    console.log(user);
+                                    return (
+                                        <article className="user-container" onClick={() => {
+                                            navigate(`/user/${user._id}`);
+                                        }} key={nanoid()}>
+                                            <div className="user-box">
+                                                <img src={user.profilePicture || emptyProfilePicture} alt={user.name}/>
+                                                <div>
+                                                    <div className="nickName">{user.nickName}</div>
+                                                    <div className="createdAt">@{user.name}</div>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    );
+                                })}
+                            </>
+                            </div>
                         )}
-                        {suggestedUsers.map(user => {
-                            return (
-                                <article className="user-container" onClick={() => {
-                                    navigate(`/user/${user._id}`);
-                                }} key={nanoid()}>
-                                    <div className="user-box">
-                                        <img src={user.profilePicture || emptyProfilePicture} alt={user.name}/>
-                                        <div>{user.name}</div>
-                                    </div>
-                                </article>
-                            );
-                        })}
-                    </>
-                )}
-            </div>
-            {globalSearchLoading ? (
-                <Loading title="Loading Search Results" position='normal' marginTop='1rem'/>
-            ) : (
-                <>
-                    {posts.length ? (
-                        <PostsList data={posts!} totalPosts={totalPosts!} hide={false}/>
+                    </div>
+                    {globalSearchLoading ? (
+                        <Loading title="Loading Search Results" position='normal' marginTop='1rem'/>
                     ) : (
-                        <div className="no-posts">No Posts Found...</div>
+                        <>
+                            {posts.length ? (
+                                <PostsList data={posts!} totalPosts={totalPosts!} hide={false}/>
+                            ) : (
+                                <div>
+                                    <div className="suTitle">Suggested Users</div>
+                                    <div className="noResponse">No Posts Found...</div>
+                                </div>
+                            )}
+                            {numberOfPages! > 1 && (
+                                <PaginationBox numberOfPages={numberOfPages!} page={page} changePage={setPage} updateSearch={getGlobalSearch}/>
+                            )}
+                        </>
                     )}
-                    {numberOfPages! > 1 && (
-                        <PaginationBox numberOfPages={numberOfPages!} page={page} changePage={setPage} updateSearch={getGlobalSearch}/>
-                    )}
-                </>
-            )}
+                </div>
+                <TrendingBox/>
+            </div>
         </Wrapper>
     );
 }
 
 const Wrapper = styled.div`
     .search-box {
-        margin: 1rem auto;
-        width: 50%;
-        border-radius: 2rem;
+        padding:10px;
         .search {
+            padding:20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            border-radius: 12px;
+            justify-content: space-between;
+            background-color:rgb(28, 39, 48);
         }
         input {
-            width: 75%;
-            padding: 0.25rem;
+            flex:1;
+            display:flex;
+            color:#FFFFFF;
+            border-width:0px;
+            padding:10px 15px;
+            border-radius:12px;
+            background-color:rgb(39, 52, 62);
         }
         button {
-            width: 25%;
-            padding: 0.25rem;
-            cursor: pointer;
+            width:40px;
+            height:40px;
+            border-width:0px;
+            margin-left:15px;
+            border-radius:12px;
+            cursor:pointer;
+            background-color:#1c9be8;
+            svg {
+                color:#FFFFFF;
+                margin-bottom:-2px;
+            }
         }
-        button:hover, button:active {
-            color: gray;
+        button:hover {
+            opacity:0.7;
         }
         .result-box {
             outline: 1px solid black;
         }
     }
     .people-box {
-        outline: 1px solid black;
-        padding: 0.25rem;
-        margin: 1rem 0;
+        .searchPostResponse {
+            padding:0px;
+        }
         .title {
-            border-bottom: 1px solid black;
+            padding: 10px;
+            color:#FFFFFF;
+            font-size: 18px;
+            font-weight: 500;
         }
         .loading {
+            color:#FFFFFF;
             text-align: center;
-            margin: 1rem 0;
+            margin: 20px;
         }
         .user-container {
-            padding: 0.25rem;
+            padding:10px;
             .user-box {
+                padding:20px;
                 cursor: pointer;
                 margin-top: 0.25rem;
+                border-radius: 12px;
+                background-color: rgb(28, 39, 48);
                 img {
-                    width: 1.5rem;
-                    height: 1.5rem;
-                    outline: 1px solid black;
-                    margin-right: 0.5rem;
+                    width: 3.125rem;
+                    height: 3.125rem;
+                    border-radius:999px;
+                    margin-right: 10px;
                 }
                 display: flex;
                 align-items: center;
             }
-            .user-box:active, .user-box:hover {
-                background-color: lightgray;
-                outline: 1px solid black;
+            .user-box:hover {
+                opacity:0.7;
             }
         }
     }
@@ -136,6 +171,36 @@ const Wrapper = styled.div`
         background-color: black;
         color: white;
         padding: 0.25rem;
+    }
+    .nickName {
+        font-size: 14px;
+        color: white;
+    }
+    .name {
+        font-size: 12px;
+        color: #6c7a87;
+    }
+    .createdAt {
+        font-size: 12px;
+        color: #6c7a87;    
+        margin-top: 2px;
+    }
+    .noResponse {
+        margin:10px;
+        padding:20px;
+        font-size:14px;
+        color:#FFFFFF;
+        border-radius:12px;
+        background-color:rgb(28, 39, 48);
+    }
+    .suTitle {
+        padding: 10px;
+        color:#FFFFFF;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    section .list-info {
+        padding-top:0px;
     }
 `;
 

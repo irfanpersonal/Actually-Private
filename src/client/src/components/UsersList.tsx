@@ -6,6 +6,7 @@ import {useNavigate} from 'react-router-dom';
 import {setSearch} from '../features/search/searchSlice';
 import {useDispatch} from 'react-redux';
 import {type useDispatchType} from '../store';
+import {FaSearch} from 'react-icons/fa';
 
 interface UsersListProps {
     data: UserType[],
@@ -15,7 +16,6 @@ interface UsersListProps {
 const UsersList: React.FunctionComponent<UsersListProps> = ({data, search}) => {
     const dispatch = useDispatch<useDispatchType>();
     const navigate = useNavigate();
-    console.log(search);
     return (
         <Wrapper>
             {!data.length && (
@@ -32,7 +32,7 @@ const UsersList: React.FunctionComponent<UsersListProps> = ({data, search}) => {
                         <div onClick={() => {
                             dispatch(setSearch(search));
                             navigate('/search');
-                        }} className="direct-search">Search for "{search}"</div>
+                        }} className="direct-search"><FaSearch/> Search for "{search}"</div>
                     )}
                 </>
             )}
@@ -45,15 +45,28 @@ const Wrapper = styled.section`
     max-height: 10rem;
     overflow: auto;
     .no-users {
-        text-align: center;
-        border-bottom: 1px solid black;
+        font-size:14px;
+        color:#FFFFFF;
+        padding-top:20px;
+        text-align: left;
     }
     .direct-search {
+        display:flex;
+        font-size:14px;
+        color:#FFFFFF;
         cursor: pointer;
-        padding: 0.25rem;
+        margin-top:15px;
+        padding:10px 15px;
+        border-radius:12px;
+        align-items:center;
+        background-color:#27343e;
+        svg {
+            font-size:12px;
+            margin-right:15px;
+        }
     }
     .direct-search:hover, .direct-search:active {
-        background-color: lightgray;
+        background-color: #27333d;
     }
 `;
 

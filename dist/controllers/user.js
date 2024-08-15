@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserPassword = exports.updateUser = exports.getSingleUser = exports.getAllUsers = exports.getProfileData = exports.showCurrentUser = void 0;
+exports.discoverPeople = exports.updateUserPassword = exports.updateUser = exports.getSingleUser = exports.getAllUsers = exports.getProfileData = exports.showCurrentUser = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const errors_1 = __importDefault(require("../errors"));
 const utils_1 = require("../utils");
@@ -20,7 +20,8 @@ const models_1 = require("../models");
 const cloudinary_1 = require("cloudinary");
 const node_path_1 = __importDefault(require("node:path"));
 const showCurrentUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    return res.status(http_status_codes_1.StatusCodes.OK).json({ user: req.user });
+    const user = yield models_1.User.findById(req.user.userID).select('-password');
+    return res.status(http_status_codes_1.StatusCodes.OK).json({ user });
 });
 exports.showCurrentUser = showCurrentUser;
 const getProfileData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -118,13 +119,13 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             yield cloudinary_1.v2.uploader.destroy(oldImage.substring(0, oldImage.lastIndexOf('.')));
         }
         const uniqueIdentifier = new Date().getTime() + '_' + req.user.name + '_' + 'profile' + '_' + profilePicture.name;
-        const destination = node_path_1.default.resolve(__dirname, '../images', uniqueIdentifier);
+        const destination = node_path_1.default.resolve(__dirname, '../files', uniqueIdentifier);
         yield profilePicture.mv(destination);
         const result = yield cloudinary_1.v2.uploader.upload(destination, {
             public_id: uniqueIdentifier,
             folder: 'ACTUALLY-PRIVATE/PROFILE_IMAGES'
         });
-        yield (0, utils_1.deleteImage)(destination);
+        yield (0, utils_1.deleteFile)(destination);
         updatedUser.profilePicture = result.secure_url;
         yield updatedUser.save();
     }
@@ -150,3 +151,17 @@ const updateUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
         } });
 });
 exports.updateUserPassword = updateUserPassword;
+const discoverPeople = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield models_1.User.find({
+        role: {
+            $ne: 'admin'
+        },
+        _id: {
+            $ne: req.user.userID
+        }
+    });
+    const shuffledUsers = users.sort(() => 0.5 - Math.random());
+    const randomThree = shuffledUsers.slice(0, 3);
+    return res.status(http_status_codes_1.StatusCodes.OK).json({ users: randomThree });
+});
+exports.discoverPeople = discoverPeople;

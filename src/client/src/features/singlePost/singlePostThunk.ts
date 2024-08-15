@@ -102,14 +102,3 @@ export const editSinglePostComment = createAsyncThunk('singlePost/editSinglePost
         return thunkAPI.rejectWithValue(error.response.data.msg);
     }
 });
-
-export const updateSinglePost = createAsyncThunk('singlePost/updateSinglePost', async(inputData: {postID: string, data: FormData}, thunkAPI) => {
-    try {
-        const response = await axios.patch(`/api/v1/post/${inputData.postID}`, inputData.data);
-        const data = response.data;
-        return data.post;
-    }
-    catch(error: any) {
-        return thunkAPI.rejectWithValue(error.response.data.msg);
-    }
-});

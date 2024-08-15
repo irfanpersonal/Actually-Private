@@ -19,11 +19,11 @@ const PostsList: React.FunctionComponent<PostsListProps> = ({data, totalPosts, h
     return (
         <Wrapper>
             <div className="list-info">
-                <h1>{totalPosts} Post{totalPosts! > 1 && 's'} Found...</h1>
-                <div>
+                <h1 className="result-info">{totalPosts} Post{totalPosts! > 1 && 's'} Found.</h1>
+                {/* <div>
                     <MdGridView onClick={() => setViewType(currentState => 'grid')} className={`view-type ${viewType === 'grid' && 'active-type'}`}/>
                     <GiHamburgerMenu onClick={() => setViewType(currentState => 'list')} className={`view-type ${viewType === 'list' && 'active-type'}`}/>
-                </div>
+                </div> */}
             </div>
             <div className={`${viewType === 'grid' && 'grid-styling'}`}>
                 {data.map(item => {
@@ -39,10 +39,17 @@ const PostsList: React.FunctionComponent<PostsListProps> = ({data, totalPosts, h
 const Wrapper = styled.section`
     .list-info {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid black;
-        margin-bottom: 1rem;
+        padding-top:20px;
+        justify-content: space-between;
+        h1 {
+            padding:10px;
+            font-size:18px;
+            font-weight:500;
+        }
+        .result-info {
+            color: white;
+        }
     }
     .view-type {
         cursor: pointer;
@@ -57,7 +64,7 @@ const Wrapper = styled.section`
     }
     .grid-styling {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
         gap: 0.5rem;
     }
 `;

@@ -7,17 +7,21 @@ import {updateFollowRequest} from '../followRequests/followRequestsThunk';
 export type PostType = {
     _id: string,
     location: string,
-    image: string,
+    type: 'content' | 'image' | 'video' | 'audio' | 'file'
+    attachmentUrl: string,
     content: string,
     user: UserType,
     liked: boolean,
     likes: string[],
-    comments: string[]
+    comments: string[],
+    createdAt: string,
+    updatedAt: string
 };
 
 export type UserType = {
     _id: string,
     name: string,
+    nickName: string,
     email: string,
     profilePicture: string,
     location: string,
@@ -93,12 +97,14 @@ const profileSlice = createSlice({
             const likedPost = state.posts.find(item => item._id === postID);
             if (likedPost) {
                 likedPost!.liked = true;
+                likedPost!.likes.push('NEW LIKE');
             }
         }).addCase(unlikePost.fulfilled, (state, action) => {
             const postID = action.meta.arg;
             const unlikedPost = state.posts.find(item => item._id === postID);
             if (unlikedPost) {
                 unlikedPost!.liked = false;
+                unlikedPost.likes.pop();
             }
         }).addCase(updateFollowRequest.fulfilled, (state, action) => {
             if (action.meta.arg.accepted) {

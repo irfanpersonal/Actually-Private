@@ -1,7 +1,7 @@
 import express from 'express';
 const router: express.Router = express.Router();
 
-import {showCurrentUser, getProfileData, getAllUsers, getSingleUser, updateUser, updateUserPassword} from '../controllers/user';
+import {showCurrentUser, getProfileData, getAllUsers, getSingleUser, updateUser, updateUserPassword, discoverPeople} from '../controllers/user';
 import {followUser, createFollowRequest, deleteFollowRequest, viewAllFollowRequests, updateFollowRequest, unfollowUser} from '../controllers/follow';
 import {blockUser, unblockUser} from '../controllers/block';
 import {authentication, restrictFunctionalityTo} from '../middleware/authentication';
@@ -13,6 +13,7 @@ router.route('/getUsersPosts').get(authentication, restrictFunctionalityTo('user
 router.route('/updateUser').patch(authentication, restrictFunctionalityTo('user'), updateUser);
 router.route('/updateUserPassword').patch(authentication, restrictFunctionalityTo('user'), updateUserPassword);
 router.route('/showCurrentUser').get(authentication, showCurrentUser);
+router.route('/discoverPeople').get(authentication,  restrictFunctionalityTo('user'), discoverPeople);
 router.route('/viewAllFollowRequests').get(authentication, restrictFunctionalityTo('user'), viewAllFollowRequests);
 router.route('/viewAllFollowRequests/:id').patch(authentication, restrictFunctionalityTo('user'), updateFollowRequest);
 router.route('/:id/getSingleUserPosts').get(authentication, restrictFunctionalityTo('user'), getSingleUserPosts);

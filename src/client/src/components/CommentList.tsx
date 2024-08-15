@@ -14,7 +14,7 @@ const CommentList: React.FunctionComponent<CommentListProps> = ({data, totalComm
             {totalComments ? (
                 <h1 className="title">{totalComments} Comment{totalComments! > 1 && 's'} Found...</h1>
             ): (
-                <h1 className="center">No Comments Found...</h1>
+                <h1 className=""></h1>
             )}
             {data.map(item => {
                 return (
@@ -26,16 +26,13 @@ const CommentList: React.FunctionComponent<CommentListProps> = ({data, totalComm
 }
 
 const Wrapper = styled.section`
-    margin-top: 1rem;
-    outline: 1px solid black;
-    padding: 1rem;
-    .title {
-        text-align: center;
-        background-color: black;
-        color: white;
-    }
-    .center {
-        text-align: center;
+    
+    h1 {
+        padding:10px;
+        font-size:18px;
+        color:#FFFFFF;
+        font-weight:500;
+        display:none;
     }
 `;
 

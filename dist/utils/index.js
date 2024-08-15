@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatDuration = exports.deleteImage = exports.verifyToken = exports.createCookieWithToken = exports.createToken = void 0;
+exports.formatDuration = exports.deleteFile = exports.verifyToken = exports.createCookieWithToken = exports.createToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const createToken = (user) => {
@@ -39,14 +39,14 @@ const verifyToken = (token) => {
     return jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
 };
 exports.verifyToken = verifyToken;
-const deleteImage = (path) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteFile = (path) => __awaiter(void 0, void 0, void 0, function* () {
     yield node_fs_1.default.unlink(path, (err) => {
         if (err) {
             console.log(err);
         }
     });
 });
-exports.deleteImage = deleteImage;
+exports.deleteFile = deleteFile;
 const formatDuration = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);

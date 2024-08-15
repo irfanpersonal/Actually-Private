@@ -18,7 +18,8 @@ const register = async(req: AuthRequest, res: Response) => {
         userID: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        profilePicture: user.profilePicture
     }});
 }
 
@@ -41,7 +42,8 @@ const login = async(req: AuthRequest, res: Response) => {
         userID: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        profilePicture: user.profilePicture
     }});
 }
 

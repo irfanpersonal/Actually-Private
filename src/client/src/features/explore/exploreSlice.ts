@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {type UserType} from '../profile/profileSlice';
-import {getTrendingTopics, getAllUsers} from './exploreThunk';
+import {getTrendingTopics, getAllUsers, getTrendingBoxInformation} from './exploreThunk';
 
 interface IExplore {
     getTrendingTopicsLoading: boolean,
@@ -10,7 +10,9 @@ interface IExplore {
     users: UserType[],
     totalUsers: number | null,
     numberOfPages: number | null,
-    page: number
+    page: number,
+    getTrendingBoxInformationLoading: boolean,
+    trendingBoxInformation: string[]
 }
 
 const initialState: IExplore = {
@@ -21,7 +23,9 @@ const initialState: IExplore = {
     users: [],
     totalUsers: null,
     numberOfPages: null,
-    page: 1
+    page: 1,
+    getTrendingBoxInformationLoading: true,
+    trendingBoxInformation: []
 };
 
 const exploreSlice = createSlice({
@@ -58,6 +62,13 @@ const exploreSlice = createSlice({
             state.numberOfPages = action.payload.numberOfPages;
         }).addCase(getAllUsers.rejected, (state) => {
             state.getAllUsersLoading = false;
+        }).addCase(getTrendingBoxInformation.pending, (state) => {
+            state.getTrendingBoxInformationLoading = true;
+        }).addCase(getTrendingBoxInformation.fulfilled, (state, action) => {
+            state.getTrendingBoxInformationLoading = false;
+            state.trendingBoxInformation = action.payload;
+        }).addCase(getTrendingBoxInformation.rejected, (state) => {
+            state.getTrendingBoxInformationLoading = false;
         });
     }
 });

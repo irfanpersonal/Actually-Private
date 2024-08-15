@@ -3,9 +3,8 @@ import emptyProfilePicture from '../images/empty-profile-picture.jpeg';
 import {useDispatch} from 'react-redux';
 import {type useDispatchType} from '../store';
 import {type FollowRequestType} from '../features/followRequests/followRequestsSlice';
-import {FaWindowClose} from 'react-icons/fa';
-import {IoIosCheckmarkCircle} from "react-icons/io";
 import {updateFollowRequest} from '../features/followRequests/followRequestsThunk';
+import { CiCircleCheck, CiCircleRemove } from "react-icons/ci";
 
 interface FollowRequestListItemProps {
     data: FollowRequestType
@@ -16,33 +15,32 @@ const FollowRequestListItem: React.FunctionComponent<FollowRequestListItemProps>
     return (
         <Wrapper>
             <div className="user-info">
-                <img className="pfp" src={data.from.profilePicture || emptyProfilePicture} alt={data.from.name}/>
-                <div>{data.from.name}</div>
+                <img className="img50Round" src={data.from.profilePicture || emptyProfilePicture} alt={data.from.name}/>
+                <div className="f14 cWhite">{data.from.name}</div>
             </div>
             <div className="user-options">
                 <div onClick={() => {
                     const formData = new FormData();
                     formData.append('status', 'rejected');
                     dispatch(updateFollowRequest({followRequestID: data._id, data: formData, accepted: false}));
-                }}><FaWindowClose/></div>
+                }}><CiCircleRemove color={'#A80000'} size={'32px'}/></div>
                 <div onClick={() => {
                     const formData = new FormData();
                     formData.append('status', 'accepted');
                     dispatch(updateFollowRequest({followRequestID: data._id, data: formData, accepted: true}));
-                }}><IoIosCheckmarkCircle/></div>
+                }}><CiCircleCheck color={'#4CAF50'} size={'32px'}/></div>
             </div>
         </Wrapper>
     );
 }
 
 const Wrapper = styled.article`
-    outline: 1px solid black;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
+    display:flex;
     align-items: center;
+    margin-top:20px;
     .user-info {
+        flex:1;
+        gap:15px;
         display: flex;
         align-items: center;
         .pfp {
@@ -54,7 +52,9 @@ const Wrapper = styled.article`
         }
     }
     .user-options {
-        display: flex;
+        gap:10px;
+        display:flex;
+        flex-direction:row;
         svg {   
             cursor: pointer;
             font-size: 1.25rem;

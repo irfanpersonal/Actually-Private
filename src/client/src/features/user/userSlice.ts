@@ -1,11 +1,34 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {registerUser, loginUser, showCurrentUser, logoutUser} from './userThunk';
+import {registerUser, loginUser, showCurrentUser, logoutUser, getUserBoxInformation, getDisoverPeopleInformation} from './userThunk';
 import {toast} from 'react-toastify';
 
 export type UserType = {
     userID: string,
     name: string,
+    nickName: string,
     email: string,
+    profilePicture: string,
+    location: string,
+    bio: string,
+    dateOfBirth: string,
+    followers: string[],
+    following: string[],
+    visibility: 'public' | 'private',
+    role: 'user' | 'admin'
+};
+
+export type User = {
+    _id: string,
+    name: string,
+    nickName: string,
+    email: string,
+    profilePicture: string,
+    location: string,
+    bio: string,
+    dateOfBirth: string,
+    followers: string[],
+    following: string[],
+    visibility: 'public' | 'private',
     role: 'user' | 'admin'
 };
 
@@ -14,7 +37,11 @@ interface IUser {
     authLoading: boolean,
     logoutLoading: boolean,
     wantsToRegister: boolean,
-    user: UserType | null
+    user: UserType | null,
+    getUserBoxInformationLoading: boolean,
+    userBoxInformation: User | null,
+    getDisoverPeopleInformationLoading: boolean,
+    discoverPeopleInformation: User[]
 }
 
 const initialState: IUser = {
@@ -22,7 +49,11 @@ const initialState: IUser = {
     authLoading: false,
     logoutLoading: false,
     wantsToRegister: true,
-    user: null
+    user: null,
+    getUserBoxInformationLoading: true,
+    userBoxInformation: null,
+    getDisoverPeopleInformationLoading: true,
+    discoverPeopleInformation: []
 };
 
 const userSlice = createSlice({
@@ -67,6 +98,20 @@ const userSlice = createSlice({
             toast.success('Successfully Logged Out!');
         }).addCase(logoutUser.rejected, (state) => {
             state.logoutLoading = false;
+        }).addCase(getUserBoxInformation.pending, (state) => {
+            state.getUserBoxInformationLoading = true;
+        }).addCase(getUserBoxInformation.fulfilled, (state, action) => {
+            state.getUserBoxInformationLoading = false;
+            state.userBoxInformation = action.payload;
+        }).addCase(getUserBoxInformation.rejected, (state, action) => {
+            state.getUserBoxInformationLoading = false;
+        }).addCase(getDisoverPeopleInformation.pending, (state) => {
+            state.getDisoverPeopleInformationLoading = true;
+        }).addCase(getDisoverPeopleInformation.fulfilled, (state, action) => {
+            state.getDisoverPeopleInformationLoading = false;
+            state.discoverPeopleInformation = action.payload;
+        }).addCase(getDisoverPeopleInformation.rejected, (state) => {
+            state.getDisoverPeopleInformationLoading = false;
         });
     }
 });

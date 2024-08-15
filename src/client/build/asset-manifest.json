@@ -1,14 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.1b0b8f12.css",
-    "main.js": "/static/js/main.51dee4e6.js",
+    "main.css": "/static/css/main.74b6c84f.css",
+    "main.js": "/static/js/main.2879e696.js",
+    "static/media/home.png": "/static/media/home.daa4093c199643885ea5.png",
+    "static/media/trioThree.png": "/static/media/trioThree.0b889f235cbc65fd0bcf.png",
+    "static/media/trioTwo.png": "/static/media/trioTwo.67b60da9ef34ff0e8cd1.png",
+    "static/media/trioOne.png": "/static/media/trioOne.cfcb8028fc38b70ec198.png",
     "static/media/empty-profile-picture.jpeg": "/static/media/empty-profile-picture.3491557d982beb3faeea.jpeg",
+    "static/media/cover.jpg": "/static/media/cover.5801a3bc4209c76aa840.jpg",
     "index.html": "/index.html",
-    "main.1b0b8f12.css.map": "/static/css/main.1b0b8f12.css.map",
-    "main.51dee4e6.js.map": "/static/js/main.51dee4e6.js.map"
+    "main.74b6c84f.css.map": "/static/css/main.74b6c84f.css.map",
+    "main.2879e696.js.map": "/static/js/main.2879e696.js.map"
   },
   "entrypoints": [
-    "static/css/main.1b0b8f12.css",
-    "static/js/main.51dee4e6.js"
+    "static/css/main.74b6c84f.css",
+    "static/js/main.2879e696.js"
   ]
 }

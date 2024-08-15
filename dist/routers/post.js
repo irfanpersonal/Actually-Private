@@ -21,5 +21,5 @@ router.route('/:id/comment/:commentID').patch(authentication_1.authentication, (
 router.route('/:id/comment/:commentID').delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.deleteSingleComment);
 router.route('/:id/comment/:commentID/like').post(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.likeComment);
 router.route('/:id/comment/:commentID/unlike').delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), comment_1.unlikeComment);
-router.route('/:id').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getSinglePost).patch(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.updateSinglePost).delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.deleteSinglePost);
+router.route('/:id').get(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.getSinglePost).delete(authentication_1.authentication, (0, authentication_1.restrictFunctionalityTo)('user'), post_1.deleteSinglePost);
 exports.default = router;

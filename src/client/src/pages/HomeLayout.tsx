@@ -9,6 +9,7 @@ const HomeLayout: React.FunctionComponent = () => {
                 <Navbar/>
             </div>
             <section className="eighty">
+                
                 <Outlet/>
             </section>
         </Wrapper>
@@ -17,12 +18,10 @@ const HomeLayout: React.FunctionComponent = () => {
 
 const Wrapper = styled.div`
     display: flex;
+    flex-direction:column;
     .twenty {
-        width: 20%;
     }
     .eighty {
-        width: 80%;
-        padding: 0.5rem;
     }
 `;
 
